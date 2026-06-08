@@ -1,0 +1,39 @@
+services:
+  cli:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+      target: dev
+    image: heleket-python-sdk:dev
+    volumes:
+      - ./:/app
+    working_dir: /app
+    env_file:
+      - .env
+    command: sh
+
+  webhook:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+      target: dev
+    image: heleket-python-sdk:dev
+    volumes:
+      - ./:/app
+    working_dir: /app
+    env_file:
+      - .env
+    ports:
+      - '8000:8000'
+    command: python examples/05_handle_webhook.py
+
+  qa:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+      target: dev
+    image: heleket-python-sdk:dev
+    volumes:
+      - ./:/app
+    working_dir: /app
+    command: sh -c "ruff check . && mypy && pytest -q"
