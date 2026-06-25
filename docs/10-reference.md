@@ -34,6 +34,20 @@
 | `SYSTEM_FAIL` | `system_fail` | yes | no |
 | `UNKNOWN` | `unknown` | no | no |
 
+## AML link statuses (`AmlLinkStatus`)
+
+Returned per item by `get_aml_links()` for a blocked (locked) payment.
+
+| Enum | Wire value | Final? | Successful? |
+|---|---|---|---|
+| `INIT` | `init` | no | no |
+| `PENDING` | `pending` | no | no |
+| `COMPLETED` | `completed` | yes | yes |
+| `EXPIRED` | `expired` | yes | no |
+| `UNKNOWN` | `unknown` | no | no |
+
+`UNKNOWN` is the fallback when the server returns an unrecognised string, same as the other status enums.
+
 ## Course sources (`CourseSource`)
 
 Sets which exchange-rate provider Heleket uses for fiat-to-crypto conversion.
@@ -53,29 +67,35 @@ Sets which exchange-rate provider Heleket uses for fiat-to-crypto conversion.
 |---|---|---|
 | `create_invoice` | POST | `/v1/payment` |
 | `get_info` | POST | `/v1/payment/info` |
+| `get_aml_links` | POST | `/v1/payment/aml-links` |
 | `list_history` | POST | `/v1/payment/list` (+ `?cursor=`) |
 | `create_static_wallet` | POST | `/v1/wallet` |
 | `generate_qr_code` | POST | `/v1/wallet/qr` |
 | `block_static_wallet` | POST | `/v1/wallet/block-address` |
 | `refund_blocked_wallet` | POST | `/v1/wallet/blocked-address-refund` |
-| `refund` | POST | `/v1/payment/refund` |
 | `resend_webhook` | POST | `/v1/payment/resend` |
 | `test_webhook` | POST | `/v1/test-webhook/{payment\|wallet}` |
 | `list_services` | POST | `/v1/payment/services` |
 | `get_balance` | POST | `/v1/balance` |
-| `get_exchange_rates` | POST | `/v1/exchange-rate/{ccy}/list` |
+| `get_exchange_rates` | GET | `/v1/exchange-rate/{ccy}/list` |
 
 ### Payouts (`HeleketPayout`)
 
 | Method | HTTP | Path |
 |---|---|---|
 | `create_payout` | POST | `/v1/payout` |
+| `refund` | POST | `/v1/payment/refund` (signed with payout key) |
 | `get_info` | POST | `/v1/payout/info` |
 | `list_history` | POST | `/v1/payout/list` (+ `?cursor=`) |
 | `calculate_withdrawal` | POST | `/v1/payout/calculate` |
 | `list_services` | POST | `/v1/payout/services` |
 | `transfer_to_personal` | POST | `/v1/transfer/to-personal` |
 | `transfer_to_business` | POST | `/v1/transfer/to-business` |
+
+Two things to note:
+
+- **Most requests use POST**, even reads. The only `GET` is `get_exchange_rates` (`/v1/exchange-rate/{ccy}/list`) — it carries its input in the path, so the signed body is empty (`sign = md5(api_key)`).
+- **`refund` is the only cross-key endpoint:** a payment-domain path (`/v1/payment/refund`) signed with the **payout** key, exposed as `HeleketPayout.refund()`. `HeleketPayment` does not expose `refund()`.
 
 ## Wire envelope
 

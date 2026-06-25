@@ -1,7 +1,8 @@
 .PHONY: help install test lint lint-fix fmt fmt-check typecheck qa \
         example-invoice example-info example-history example-static-wallet \
         example-webhook example-balance example-payout example-payout-info \
-        example-services example-rates webhook-inspect \
+        example-services example-rates example-aml-links example-refund webhook-inspect \
+        build publish publish-test \
         docker-build docker-shell docker-webhook docker-qa clean
 
 POETRY ?= poetry
@@ -69,11 +70,28 @@ example-services: ## List supported (currency, network) pairs
 example-rates: ## Print exchange rates for a fiat currency (CCY=USD)
 	$(POETRY) run python examples/10_exchange_rates.py $(CCY)
 
+example-aml-links: ## AML links for a blocked payment (pass ID=<uuid|order_id>)
+	$(POETRY) run python examples/11_aml_links.py $(ID)
+
+example-refund: ## Refund an invoice (UUID=<invoice-uuid> ADDRESS=<addr>)
+	$(POETRY) run python examples/12_refund.py $(UUID) $(ADDRESS)
+
 # ---------- CLI ---------------------------------------------------------------
 
 webhook-inspect: ## Verify a webhook from FILE=<path> or stdin (KEY=...)
 	$(POETRY) run heleket-webhook-inspect --key=$(KEY) \
 		$(if $(FILE),--file=$(FILE),) $(if $(TYPE),--type=$(TYPE),)
+
+# ---------- Release -----------------------------------------------------------
+
+build: qa ## Run the QA gates, then build sdist + wheel into dist/
+	$(POETRY) build
+
+publish: ## Publish dist/ to PyPI (run `make build` first; needs a configured token)
+	$(POETRY) publish
+
+publish-test: ## Publish to TestPyPI (configure the `testpypi` repository first)
+	$(POETRY) publish --repository testpypi
 
 # ---------- Docker ------------------------------------------------------------
 

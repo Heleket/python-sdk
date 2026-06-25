@@ -16,7 +16,7 @@ from typing import Any, Generic, TypeVar
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from ._status import CourseSource, PaymentStatus, PayoutStatus
+from ._status import AmlLinkStatus, CourseSource, PaymentStatus, PayoutStatus
 
 __all__ = [
     # Requests
@@ -36,6 +36,7 @@ __all__ = [
     "QrCode",
     "BlockedWallet",
     "RefundResult",
+    "AmlLink",
     "Service",
     "ServiceLimit",
     "ServiceCommission",
@@ -263,6 +264,20 @@ class RefundResult(BaseModel):
     network: str | None = None
     address: str | None = None
     status: str | None = None
+
+
+class AmlLink(BaseModel):
+    """One AML/KYC/SoF questionnaire link for a blocked (locked) payment.
+
+    Returned per item by :meth:`HeleketPayment.get_aml_links`. Hand ``link`` to
+    the end user to complete the questionnaire and unblock the payment.
+    """
+
+    model_config = _RESPONSE_CONFIG
+
+    link: str | None = None
+    expired_at: str | None = None
+    status: AmlLinkStatus | None = None
 
 
 class ServiceLimit(BaseModel):

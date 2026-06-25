@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from heleket_sdk import PaymentStatus, PayoutStatus
+from heleket_sdk import AmlLinkStatus, PaymentStatus, PayoutStatus
 
 
 def test_payment_wire_values_round_trip() -> None:
@@ -69,3 +69,24 @@ def test_payout_final_and_successful() -> None:
     assert not PayoutStatus.FAIL.is_successful()
     assert not PayoutStatus.PROCESS.is_final()
     assert not PayoutStatus.UNKNOWN.is_final()
+
+
+def test_aml_link_wire_values_round_trip() -> None:
+    for status in AmlLinkStatus:
+        assert AmlLinkStatus(status.value) is status
+
+
+def test_aml_link_unknown_wire_falls_back_to_unknown() -> None:
+    assert AmlLinkStatus("not_a_real_status") is AmlLinkStatus.UNKNOWN
+
+
+def test_aml_link_status_classification() -> None:
+    assert AmlLinkStatus.COMPLETED.is_final()
+    assert AmlLinkStatus.EXPIRED.is_final()
+    assert not AmlLinkStatus.INIT.is_final()
+    assert not AmlLinkStatus.PENDING.is_final()
+
+    assert AmlLinkStatus.COMPLETED.is_successful()
+    assert not AmlLinkStatus.EXPIRED.is_successful()
+    assert not AmlLinkStatus.PENDING.is_successful()
+    assert not AmlLinkStatus.INIT.is_successful()

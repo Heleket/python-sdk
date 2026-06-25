@@ -58,10 +58,12 @@ Full reference lives in [`docs/`](docs/README.md):
 src/heleket_sdk/         Source — single source of truth
 src/heleket_sdk/webhook  Webhook signature verifier (byte-fidelity)
 tests/                   pytest suite + FakeTransport for offline testing
-examples/                Ten runnable scripts covering every endpoint
+examples/                Twelve runnable scripts covering every endpoint
 bin/                     heleket-webhook-inspect — CLI for verifying webhook payloads
 docker/                  Multi-stage Dockerfile (python:3.11-slim)
 docs/                    Full module documentation
+CHANGELOG.md             Notable changes per release
+UPGRADING.md             Migration notes between versions
 pyproject.toml           Poetry build + ruff + mypy + pytest config
 ```
 
@@ -87,7 +89,7 @@ make help                 # Full target list
 - **Use `verify_raw` for production webhooks.** `verify(decoded)` is convenience-only and lossy — it can't recover the PHP-style `\/` slash escapes that Heleket's server sends. See [docs/06-webhooks.md](docs/06-webhooks.md).
 - **De-duplicate replays.** Use a `(uuid, status)` key in your DB before doing side-effect work. SQLAlchemy and redis-py examples in [docs/06-webhooks.md](docs/06-webhooks.md#idempotency-and-replay-protection).
 - **Whitelist Heleket's webhook source IP `31.133.220.8`** at your reverse proxy or firewall.
-- **Two separate API keys** — payments and payouts. Mixing them breaks webhook verification.
+- **Two separate API keys** — payments and payouts. Mixing them breaks webhook verification. (One exception: `/v1/payment/refund` uses the **payout** key — call `HeleketPayout.refund()`.)
 - **The SDK never logs API keys.** Debug-mode entries include URL, method, body, and status — but the `sign` header and API key are explicitly excluded.
 
 ## License

@@ -4,14 +4,32 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "heleket-sdk"
-version = "0.1.0"
-description = "Reference Python SDK for the Heleket cryptocurrency payment API."
+version = "0.3.0"
+description = "Reference Python SDK for the Heleket cryptocurrency payment API: payments, payouts, balance, exchange rates, and signed webhooks."
 authors = ["Heleket Reference SDK Authors"]
 license = "MIT"
 readme = "README.md"
-homepage = "https://doc.heleket.com/"
-repository = "https://github.com/heleket-io/heleket"
+homepage = "https://heleket.com"
+repository = "https://github.com/Heleket/python-sdk"
+documentation = "https://doc.heleket.com/"
+keywords = ["heleket", "crypto", "cryptocurrency", "payments", "payouts", "sdk", "api", "webhooks"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Office/Business :: Financial",
+    "Operating System :: OS Independent",
+    "Typing :: Typed",
+]
 packages = [{ include = "heleket_sdk", from = "src" }]
+include = [
+    { path = "CHANGELOG.md", format = "sdist" },
+    { path = "UPGRADING.md", format = "sdist" },
+]
+
+[tool.poetry.urls]
+Changelog = "https://github.com/Heleket/python-sdk/blob/main/CHANGELOG.md"
+"Bug Tracker" = "https://github.com/Heleket/python-sdk/issues"
 
 [tool.poetry.dependencies]
 python = "^3.11"

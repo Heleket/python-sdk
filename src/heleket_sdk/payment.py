@@ -22,6 +22,7 @@ from urllib.parse import quote
 from ._base_client import BaseClient
 from ._errors import ApiError
 from .types import (
+    AmlLink,
     Balance,
     BlockedWallet,
     BlockStaticWalletRequest,
@@ -33,7 +34,6 @@ from .types import (
     InfoOptions,
     Invoice,
     QrCode,
-    RefundRequest,
     RefundResult,
     Service,
     StaticWallet,
@@ -71,6 +71,26 @@ class HeleketPayment(BaseClient):
             raise ValueError("heleket: one of uuid or order_id must be set")
         result = self._post("/v1/payment/info", options)
         return Invoice.model_validate(result)
+
+    def get_aml_links(
+        self,
+        uuid: str | None = None,
+        order_id: str | None = None,
+    ) -> list[AmlLink]:
+        """AML/KYC/SoF questionnaire links for a blocked (locked) payment.
+
+        Returns the questionnaire links the end user must complete to unblock a
+        held payment. Look up by ``uuid`` OR ``order_id`` (the server prioritises
+        ``order_id`` when both are sent). Each item carries ``link`` (the
+        questionnaire URL to hand to the user), ``expired_at``, and ``status``
+        (one of :class:`AmlLinkStatus`).
+        """
+        if uuid is None and order_id is None:
+            raise ValueError("heleket: one of uuid or order_id must be set")
+        result = self._post("/v1/payment/aml-links", {"uuid": uuid, "order_id": order_id})
+        if result is None:
+            return []
+        return [AmlLink.model_validate(item) for item in result]
 
     def list_history(self, options: HistoryOptions) -> HistoryPage[Invoice]:
         """Paginated payment history."""
@@ -110,14 +130,7 @@ class HeleketPayment(BaseClient):
         )
         return RefundResult.model_validate(result)
 
-    # ---------- refunds + replays ------------------------------------------
-
-    def refund(self, request: RefundRequest) -> RefundResult:
-        """Refund an invoice in full or in part."""
-        if request.is_empty():
-            raise ValueError("heleket: one of uuid or order_id must be set")
-        result = self._post("/v1/payment/refund", request)
-        return RefundResult.model_validate(result)
+    # ---------- webhook replays + tests ------------------------------------
 
     def resend_webhook(self, options: InfoOptions) -> None:
         """Ask Heleket to redeliver the last webhook for the invoice."""
@@ -160,9 +173,12 @@ class HeleketPayment(BaseClient):
         return Balance.model_validate(balance)
 
     def get_exchange_rates(self, currency: str) -> list[ExchangeRate]:
-        """Exchange-rate list for a given fiat currency."""
+        """Exchange-rate list for a given fiat currency.
+
+        Read-only endpoint: issued as a GET with the currency in the path.
+        """
         path = f"/v1/exchange-rate/{quote(currency)}/list"
-        result = self._post(path)
+        result = self._get(path)
         if result is None:
             return []
         return [ExchangeRate.model_validate(item) for item in result]

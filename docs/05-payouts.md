@@ -28,6 +28,26 @@ print(payout.status.value)  # process | check | paid | fail | cancel | system_fa
 
 `is_subtract=True` means the network fee comes off the payout amount (recipient receives `amount - commission`). `False` means the merchant covers the fee.
 
+## Refunds
+
+`refund(request: RefundRequest) -> RefundResult` → `POST /v1/payment/refund`
+
+Refund a paid invoice in full or in part. The endpoint sits under `/v1/payment/*`
+but is **signed with the payout API key**, so it lives on `HeleketPayout` (not
+`HeleketPayment`). Required: `address`, `is_subtract`; one of `uuid` / `order_id`.
+
+```python
+from heleket_sdk.types import RefundRequest
+
+result = client.refund(RefundRequest(
+    uuid="8b03...",
+    address=customer_wallet_address,
+    is_subtract=True,
+))
+```
+
+`is_subtract=True` deducts the network fee from the refund (so the merchant absorbs only the amount).
+
 ## Looking up a payout
 
 ```python

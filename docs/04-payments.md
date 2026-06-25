@@ -44,6 +44,27 @@ The SDK raises `ValueError` if you pass `InfoOptions()` with both fields empty �
 
 `invoice.effective_status()` returns `PaymentStatus.from(status or payment_status)`. Use it instead of switching on the raw string.
 
+## AML links for a blocked payment
+
+`get_aml_links(uuid=None, order_id=None) -> list[AmlLink]` → `POST /v1/payment/aml-links`
+
+Provide one of `uuid` or `order_id`. Returns the questionnaire links the end user
+must complete to unblock a blocked (locked) payment. Each item has `link` (the URL
+to hand to the user), `expired_at`, and `status` — see `AmlLinkStatus` and the
+status table in [10 — Reference](10-reference.md).
+
+```python
+links = client.get_aml_links(uuid=invoice_uuid)
+# or
+links = client.get_aml_links(order_id="order-42")
+
+for link in links:
+    final = link.status.is_final() if link.status else False
+    print(f"{link.link} — {link.status} (expires {link.expired_at})")
+```
+
+The SDK raises `ValueError` if you pass neither `uuid` nor `order_id`.
+
 ## Listing history
 
 ```python
@@ -92,19 +113,11 @@ qr = client.generate_qr_code(wallet.wallet_uuid)
 # qr.image is a base64-encoded PNG; render it however you like.
 ```
 
-## Refunds
+## Refunds — moved to HeleketPayout
 
-```python
-from heleket_sdk.types import RefundRequest
-
-result = client.refund(RefundRequest(
-    uuid="8b03...",
-    address=customer_wallet_address,
-    is_subtract=True,
-))
-```
-
-`is_subtract=True` deducts the network fee from the refund (so the merchant absorbs only the amount).
+> **Moved.** `/v1/payment/refund` is now signed with the **payout** API key, so
+> refunds live on `HeleketPayout.refund()` and `HeleketPayment` no longer exposes a
+> `refund()` method. See [05 — Payouts API → Refunds](05-payouts.md#refunds).
 
 ## Test webhooks
 

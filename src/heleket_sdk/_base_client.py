@@ -54,7 +54,24 @@ class BaseClient:
 
     def _post(self, path: str, params: Any = None) -> Any:
         """Send a signed POST request and return the decoded ``result`` field."""
-        body = self._encode_body(params)
+        return self._send("POST", path, self._encode_body(params))
+
+    def _get(self, path: str) -> Any:
+        """Send a signed GET request and return the decoded ``result`` field.
+
+        For read-only endpoints that carry all their input in the path (e.g.
+        exchange rates). There is no request body, so the signed bytes are the
+        empty string — exactly like a POST with no params: ``sign = md5(api_key)``.
+        """
+        return self._send("GET", path, "")
+
+    def _send(self, method: str, path: str, body: str) -> Any:
+        """Sign the exact body bytes, attach the auth headers, dispatch via the
+        transport, and translate the response.
+
+        Shared by :meth:`_post` and :meth:`_get` so the signing and error
+        handling live in exactly one place.
+        """
         signature = sign(body, self._api_key)
         url = self._options.base_url + path
 
@@ -66,10 +83,10 @@ class BaseClient:
         }
 
         if self._options.debug:
-            self._options.logger(DebugEntry.request("POST", url, body))
+            self._options.logger(DebugEntry.request(method, url, body))
 
         try:
-            response = self._transport.round_trip("POST", url, headers, body, self._options.timeout)
+            response = self._transport.round_trip(method, url, headers, body, self._options.timeout)
         except HttpError:
             raise
         except Exception as exc:  # noqa: BLE001 — wrap unexpected failures
@@ -95,7 +112,7 @@ class BaseClient:
             # Last-ditch — let json.dumps try.
             data = params
 
-        if not data and not isinstance(data, (int, float, bool)):
+        if not data and not isinstance(data, int | float | bool):
             return ""
         return json.dumps(data, separators=(",", ":"))
 

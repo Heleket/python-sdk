@@ -141,12 +141,83 @@ def test_list_services_issues_empty_body() -> None:
     assert fake.last_request().body == ""
 
 
-def test_get_exchange_rates_encodes_currency() -> None:
-    fake = FakeTransport().enqueue_json({"state": 0, "result": []})
+def test_get_exchange_rates_issues_signed_get_with_empty_body() -> None:
+    fake = FakeTransport().enqueue_json(
+        {"state": 0, "result": [{"from": "USD", "to": "BTC", "course": "0.000016"}]}
+    )
 
     rates = _client(fake).get_exchange_rates("USD")
-    assert rates == []
-    assert fake.last_request().url == "https://api.heleket.com/v1/exchange-rate/USD/list"
+    assert len(rates) == 1
+    assert rates[0].from_currency == "USD"
+
+    sent = fake.last_request()
+    # A GET carries its input in the path, so the signed body is empty.
+    assert sent.method == "GET"
+    assert sent.url == "https://api.heleket.com/v1/exchange-rate/USD/list"
+    assert sent.body == ""
+    assert sent.headers["merchant"] == MERCHANT_ID
+    assert sent.headers["sign"] == _md5_hex(API_KEY)
+
+
+def test_get_aml_links_sends_signed_post_by_uuid() -> None:
+    links = [
+        {
+            "link": "https://some.link/1",
+            "expired_at": "2025-10-23T18:23:40.000000Z",
+            "status": "completed",
+        },
+        {
+            "link": "https://some.link/2",
+            "expired_at": "2026-05-13T11:32:38.000000Z",
+            "status": "init",
+        },
+    ]
+    fake = FakeTransport().enqueue_json({"state": 0, "result": links})
+
+    result = _client(fake).get_aml_links("uuid-1")
+    assert len(result) == 2
+    assert result[0].status is not None and result[0].status.is_final()
+    assert result[1].status is not None and not result[1].status.is_final()
+
+    sent = fake.last_request()
+    assert sent.method == "POST"
+    assert sent.url == "https://api.heleket.com/v1/payment/aml-links"
+    assert sent.headers["merchant"] == MERCHANT_ID
+
+    expected_body = '{"uuid":"uuid-1"}'
+    assert sent.body == expected_body
+    assert sent.headers["sign"] == _md5_hex(
+        base64.b64encode(expected_body.encode("utf-8")).decode("ascii") + API_KEY
+    )
+
+
+def test_get_aml_links_looks_up_by_order_id() -> None:
+    fake = FakeTransport().enqueue_json({"state": 0, "result": []})
+
+    _client(fake).get_aml_links(order_id="order-1")
+
+    sent = fake.last_request()
+    assert sent.url == "https://api.heleket.com/v1/payment/aml-links"
+    assert sent.body == '{"order_id":"order-1"}'
+
+
+def test_aml_links_require_uuid_or_order_id() -> None:
+    fake = FakeTransport()
+    with pytest.raises(ValueError):
+        _client(fake).get_aml_links()
+
+
+def test_refund_is_not_exposed_on_payment_client() -> None:
+    # /v1/payment/refund is now signed with the payout key, so refund moved to
+    # HeleketPayout entirely. HeleketPayment no longer exposes it — attribute
+    # access fails fast instead of silently signing with the wrong key.
+    assert not hasattr(HeleketPayment, "refund")
+
+    fake = FakeTransport()
+    with pytest.raises(AttributeError):
+        _client(fake).refund(uuid="inv-1")  # type: ignore[attr-defined]
+
+    assert fake.requests == [], "No HTTP request should have been issued"
 
 
 def test_debug_sink_sees_request_and_response() -> None:

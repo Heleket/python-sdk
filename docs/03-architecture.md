@@ -4,12 +4,12 @@
 ┌───────────────────────┐    ┌───────────────────────┐
 │ HeleketPayment        │    │ HeleketPayout         │
 │  • create_invoice     │    │  • create_payout      │
-│  • get_info           │    │  • get_info           │
+│  • get_info           │    │  • refund             │
+│  • get_aml_links      │    │  • get_info           │
 │  • list_history       │    │  • list_history       │
 │  • create_static_wallet│   │  • calculate_withdrawal│
-│  • refund             │    │  • list_services      │
-│  • list_services      │    │  • transfer_to_*      │
-│  • get_balance        │    │                       │
+│  • list_services      │    │  • list_services      │
+│  • get_balance        │    │  • transfer_to_*      │
 │  • get_exchange_rates │    │                       │
 └──────────┬────────────┘    └──────────┬────────────┘
            │                            │
@@ -46,6 +46,8 @@
 3. **Dispatch.** Headers are `merchant: <UUID>`, `sign: <hex>`, `Content-Type: application/json`. The `Transport` protocol owns the actual HTTP call.
 4. **Debug.** If `debug=True`, request + response are dumped via the configured `DebugSink`.
 5. **Parse.** `BaseClient._parse_response` unwraps `{state, result, message, errors}`. Non-zero `state` raises `ApiError`; HTTP 422 raises `ValidationError`; bad JSON raises `ApiError` with the raw body attached.
+
+> The signing math is identical for both clients; only the key changes (payment key vs payout key). One endpoint crosses the divide: `/v1/payment/refund` is a payment-domain path signed with the **payout** key, so it lives on `HeleketPayout.refund()`.
 
 ## DTO design
 

@@ -9,7 +9,7 @@ from __future__ import annotations
 
 from enum import StrEnum
 
-__all__ = ["PaymentStatus", "PayoutStatus", "CourseSource"]
+__all__ = ["PaymentStatus", "PayoutStatus", "AmlLinkStatus", "CourseSource"]
 
 
 class PaymentStatus(StrEnum):
@@ -83,6 +83,39 @@ class PayoutStatus(StrEnum):
 
 _PAYOUT_FINAL: frozenset[PayoutStatus] = frozenset(
     {PayoutStatus.PAID, PayoutStatus.FAIL, PayoutStatus.CANCEL, PayoutStatus.SYSTEM_FAIL}
+)
+
+
+class AmlLinkStatus(StrEnum):
+    """AML/KYC/SoF questionnaire-link statuses.
+
+    Returned per item by :meth:`HeleketPayment.get_aml_links` for a blocked
+    (locked) payment. "Final" statuses are terminal — the link won't transition
+    further; intermediate statuses may still change while the user works through
+    the questionnaire.
+    """
+
+    INIT = "init"
+    PENDING = "pending"
+    COMPLETED = "completed"
+    EXPIRED = "expired"
+    UNKNOWN = "unknown"
+
+    @classmethod
+    def _missing_(cls, value: object) -> AmlLinkStatus:
+        return cls.UNKNOWN
+
+    def is_final(self) -> bool:
+        """Reports whether the link is terminal — it won't transition further."""
+        return self in _AML_LINK_FINAL
+
+    def is_successful(self) -> bool:
+        """Reports whether the questionnaire was completed."""
+        return self is AmlLinkStatus.COMPLETED
+
+
+_AML_LINK_FINAL: frozenset[AmlLinkStatus] = frozenset(
+    {AmlLinkStatus.COMPLETED, AmlLinkStatus.EXPIRED}
 )
 
 

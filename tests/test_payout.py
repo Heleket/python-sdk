@@ -2,6 +2,9 @@
 
 from __future__ import annotations
 
+import base64
+import hashlib
+
 import pytest
 
 from fakes import FakeTransport
@@ -10,6 +13,7 @@ from heleket_sdk.types import (
     CalculateRequest,
     CreatePayoutRequest,
     InfoOptions,
+    RefundRequest,
 )
 
 MERCHANT_ID = "8b03432e-385b-4670-8d06-064591096795"
@@ -22,6 +26,10 @@ def _client(fake: FakeTransport) -> HeleketPayout:
         api_key=API_KEY,
         options=ClientOptions(transport=fake),
     )
+
+
+def _md5_hex(s: str) -> str:
+    return hashlib.md5(s.encode("utf-8")).hexdigest()
 
 
 def test_create_payout_sends_signed_post() -> None:
@@ -116,3 +124,23 @@ def test_list_services_issues_empty_body() -> None:
     _client(fake).list_services()
     assert fake.last_request().body == ""
     assert fake.last_request().url == "https://api.heleket.com/v1/payout/services"
+
+
+def test_refund_posts_to_payment_refund_signed_with_payout_key() -> None:
+    fake = FakeTransport().enqueue_json(
+        {"state": 0, "result": {"uuid": "inv-1", "status": "refund_process"}}
+    )
+
+    _client(fake).refund(RefundRequest(uuid="inv-1", address="TBaCkAdDrEsS", is_subtract=True))
+
+    sent = fake.last_request()
+    assert sent.method == "POST"
+    assert sent.url == "https://api.heleket.com/v1/payment/refund"
+
+    expected_body = '{"address":"TBaCkAdDrEsS","is_subtract":true,"uuid":"inv-1"}'
+    assert sent.body == expected_body
+
+    # The whole point of the move: refund is signed with the PAYOUT key.
+    assert sent.headers["sign"] == _md5_hex(
+        base64.b64encode(expected_body.encode("utf-8")).decode("ascii") + API_KEY
+    )

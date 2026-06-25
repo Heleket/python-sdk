@@ -11,6 +11,10 @@ Heleket issues **two distinct API keys**:
 
 Mixing them breaks both API calls and webhook signature verification.
 
+> **One cross-key exception:** `/v1/payment/refund` is a payment-domain path but is
+> signed with the **payout** API key, so it is exposed as `HeleketPayout.refund()`.
+> `HeleketPayment` does not expose `refund()` at all.
+
 ## Minimal construction
 
 ```python

@@ -20,6 +20,8 @@ from .types import (
     HistoryPage,
     InfoOptions,
     Payout,
+    RefundRequest,
+    RefundResult,
     Service,
     Transfer,
 )
@@ -48,6 +50,19 @@ class HeleketPayout(BaseClient):
         """Create a withdrawal."""
         result = self._post("/v1/payout", request)
         return Payout.model_validate(result)
+
+    def refund(self, request: RefundRequest) -> RefundResult:
+        """Refund a paid invoice in full or in part.
+
+        Hits ``POST /v1/payment/refund`` but is signed with the **payout** API
+        key, so it lives on :class:`HeleketPayout` rather than
+        :class:`HeleketPayment`. Required: ``address``, ``is_subtract``; one of
+        ``uuid`` / ``order_id``.
+        """
+        if request.is_empty():
+            raise ValueError("heleket: one of uuid or order_id must be set")
+        result = self._post("/v1/payment/refund", request)
+        return RefundResult.model_validate(result)
 
     def get_info(self, options: InfoOptions) -> Payout:
         """Look up a payout by UUID or ``order_id``."""
