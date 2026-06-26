@@ -1,0 +1,67 @@
+name: Publish to PyPI
+
+on:
+  push:
+    tags:
+      - "v*"
+
+# Minimal default; jobs opt into exactly what they need.
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build distribution
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Poetry
+        run: pipx install poetry
+
+      - name: Verify tag matches package version
+        env:
+          TAG: ${{ github.ref_name }}
+        run: |
+          VERSION="$(poetry version --short)"
+          echo "tag=${TAG}  pyproject=${VERSION}"
+          if [ "${TAG#v}" != "${VERSION}" ]; then
+            echo "::error::Tag ${TAG} does not match pyproject version ${VERSION}"
+            exit 1
+          fi
+
+      - name: Build sdist + wheel
+        run: poetry build
+
+      - name: Check metadata renders on PyPI
+        run: pipx run twine check dist/*
+
+      - name: Upload dist artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+  publish:
+    name: Publish to PyPI
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/project/heleket-sdk/
+    permissions:
+      id-token: write # OIDC token for PyPI Trusted Publishing — no API token needed
+    steps:
+      - name: Download dist artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
