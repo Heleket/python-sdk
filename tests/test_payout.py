@@ -62,7 +62,7 @@ def test_create_payout_sends_signed_post() -> None:
 
     sent = fake.last_request()
     assert sent.method == "POST"
-    assert sent.url == "https://api.heleket.com/v1/payout"
+    assert sent.url == "https://api.heleket.hk/v1/payout"
     # snake_case must survive serialization (no camelCase)
     assert '"is_subtract":true' in sent.body
     assert '"order_id":"po-order-1"' in sent.body
@@ -109,7 +109,7 @@ def test_transfer_to_personal_sends_amount_and_currency() -> None:
 
     transfer = _client(fake).transfer_to_personal("1", "USDT")
     assert transfer.user_wallet_uuid == "u-1"
-    assert fake.last_request().url == "https://api.heleket.com/v1/transfer/to-personal"
+    assert fake.last_request().url == "https://api.heleket.hk/v1/transfer/to-personal"
 
 
 def test_api_error_propagates() -> None:
@@ -123,7 +123,7 @@ def test_list_services_issues_empty_body() -> None:
 
     _client(fake).list_services()
     assert fake.last_request().body == ""
-    assert fake.last_request().url == "https://api.heleket.com/v1/payout/services"
+    assert fake.last_request().url == "https://api.heleket.hk/v1/payout/services"
 
 
 def test_refund_posts_to_payment_refund_signed_with_payout_key() -> None:
@@ -135,7 +135,7 @@ def test_refund_posts_to_payment_refund_signed_with_payout_key() -> None:
 
     sent = fake.last_request()
     assert sent.method == "POST"
-    assert sent.url == "https://api.heleket.com/v1/payment/refund"
+    assert sent.url == "https://api.heleket.hk/v1/payment/refund"
 
     expected_body = '{"address":"TBaCkAdDrEsS","is_subtract":true,"uuid":"inv-1"}'
     assert sent.body == expected_body

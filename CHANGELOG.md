@@ -4,6 +4,19 @@ All notable changes to this project are documented here. The format is based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.0] - 2026-11-14
+
+### Added
+- `ClientOptions(domain=...)` (default `"heleket.hk"`) and `DEFAULT_DOMAIN`.
+  Requests go to `https://api.<domain>`; an explicit `base_url` still wins.
+- Examples read `HELEKET_DOMAIN` alongside `HELEKET_BASE_URL`.
+
+### Changed
+- The default domain is now `heleket.hk` (was `heleket.com`): API host
+  `https://api.heleket.hk`, docs and links updated. `ClientOptions.base_url`
+  now defaults to `None` and is resolved to a `str` in `__post_init__`.
+  See [`UPGRADING.md`](UPGRADING.md).
+
 ## [0.3.0] - 2026-06-25
 
 ### Added

@@ -45,11 +45,12 @@ client = HeleketPayment(merchant_id=merchant_id, api_key=payment_key, options=op
 
 | Field | Default | Description |
 |---|---|---|
-| `base_url` | `"https://api.heleket.com"` | Override the API host (testing/staging only) |
+| `base_url` | `None` (resolves to `https://api.<domain>`) | Override the full API URL (testing/staging only); wins over `domain` |
 | `timeout` | `30.0` | Per-request HTTP timeout in seconds |
 | `debug` | `False` | Toggle debug logging |
 | `logger` | `stderr_sink` | Route debug entries to your logger |
 | `transport` | `None` (defaults to `RequestsTransport`) | Swap out the HTTP layer |
+| `domain` | `"heleket.hk"` | Base domain; requests go to `https://api.<domain>`. Bare host only (no scheme or slash) |
 
 ## Django
 

@@ -50,7 +50,7 @@ def test_create_invoice_sends_signed_json_post() -> None:
 
     sent = fake.last_request()
     assert sent.method == "POST"
-    assert sent.url == "https://api.heleket.com/v1/payment"
+    assert sent.url == "https://api.heleket.hk/v1/payment"
     assert sent.headers["merchant"] == MERCHANT_ID
     assert sent.headers["Content-Type"] == "application/json"
     # User-Agent tags the client so Heleket support can identify it.
@@ -130,7 +130,7 @@ def test_list_history_appends_cursor_to_url() -> None:
         HistoryOptions(date_from="2024-01-01", date_to="2024-01-02", cursor="abc==")
     )
     assert page.items == []
-    assert fake.last_request().url == "https://api.heleket.com/v1/payment/list?cursor=abc%3D%3D"
+    assert fake.last_request().url == "https://api.heleket.hk/v1/payment/list?cursor=abc%3D%3D"
 
 
 def test_list_services_issues_empty_body() -> None:
@@ -153,7 +153,7 @@ def test_get_exchange_rates_issues_signed_get_with_empty_body() -> None:
     sent = fake.last_request()
     # A GET carries its input in the path, so the signed body is empty.
     assert sent.method == "GET"
-    assert sent.url == "https://api.heleket.com/v1/exchange-rate/USD/list"
+    assert sent.url == "https://api.heleket.hk/v1/exchange-rate/USD/list"
     assert sent.body == ""
     assert sent.headers["merchant"] == MERCHANT_ID
     assert sent.headers["sign"] == _md5_hex(API_KEY)
@@ -181,7 +181,7 @@ def test_get_aml_links_sends_signed_post_by_uuid() -> None:
 
     sent = fake.last_request()
     assert sent.method == "POST"
-    assert sent.url == "https://api.heleket.com/v1/payment/aml-links"
+    assert sent.url == "https://api.heleket.hk/v1/payment/aml-links"
     assert sent.headers["merchant"] == MERCHANT_ID
 
     expected_body = '{"uuid":"uuid-1"}'
@@ -197,7 +197,7 @@ def test_get_aml_links_looks_up_by_order_id() -> None:
     _client(fake).get_aml_links(order_id="order-1")
 
     sent = fake.last_request()
-    assert sent.url == "https://api.heleket.com/v1/payment/aml-links"
+    assert sent.url == "https://api.heleket.hk/v1/payment/aml-links"
     assert sent.body == '{"order_id":"order-1"}'
 
 

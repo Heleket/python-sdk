@@ -1,6 +1,6 @@
 # Heleket Python integration (reference)
 
-A production-grade reference SDK for the [Heleket](https://heleket.com) cryptocurrency payment API. Written for **Python 3.11+**, published as `heleket-sdk` — works with FastAPI, Django, Flask, or plain scripts.
+A production-grade reference SDK for the [Heleket](https://heleket.hk) cryptocurrency payment API. Written for **Python 3.11+**, published as `heleket-sdk` — works with FastAPI, Django, Flask, or plain scripts.
 
 Covers the full documented surface (payments, payouts, balance, services, exchange rates), ships with pytest tests, runnable examples, byte-fidelity webhook verification, debug mode wired into your choice of logger, a `heleket-webhook-inspect` CLI, and a Docker harness.
 
@@ -23,7 +23,18 @@ invoice = client.create_invoice(
     )
 )
 
-print(invoice.url)  # → https://pay.heleket.com/pay/<uuid>
+print(invoice.url)  # → https://pay.heleket.hk/pay/<uuid>
+```
+
+## Custom domain
+
+Requests go to `https://api.heleket.hk` by default. Use `domain` to target another
+domain (`https://api.<domain>`); an explicit `base_url` overrides it:
+
+```python
+from heleket_sdk import ClientOptions, HeleketPayment
+
+HeleketPayment(merchant_id=..., api_key=..., options=ClientOptions(domain="example.org"))
 ```
 
 ## Install

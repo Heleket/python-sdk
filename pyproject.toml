@@ -4,14 +4,14 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "heleket-sdk"
-version = "0.3.0"
+version = "0.4.0"
 description = "Reference Python SDK for the Heleket cryptocurrency payment API: payments, payouts, balance, exchange rates, and signed webhooks."
 authors = ["Heleket Reference SDK Authors"]
 license = "MIT"
 readme = "README.md"
-homepage = "https://heleket.com"
+homepage = "https://heleket.hk"
 repository = "https://github.com/Heleket/python-sdk"
-documentation = "https://doc.heleket.com/"
+documentation = "https://doc.heleket.hk/"
 keywords = ["heleket", "crypto", "cryptocurrency", "payments", "payouts", "sdk", "api", "webhooks"]
 classifiers = [
     "Development Status :: 4 - Beta",

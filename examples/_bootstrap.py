@@ -59,8 +59,11 @@ def env_optional(name: str, fallback: str = "") -> str:
 def _client_options() -> ClientOptions:
     base_url = env_optional("HELEKET_BASE_URL", "")
     kwargs: dict[str, Any] = {"debug": env_optional("HELEKET_DEBUG", "0") in ("1", "true")}
+    domain = env_optional("HELEKET_DOMAIN", "")
     if base_url:
         kwargs["base_url"] = base_url
+    if domain:
+        kwargs["domain"] = domain
     return ClientOptions(**kwargs)
 
 

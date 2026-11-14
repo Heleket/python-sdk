@@ -14,8 +14,8 @@ Every request emits two `DebugEntry` dataclasses: one for the outgoing request, 
 Sample output:
 
 ```
-[heleket][→ POST https://api.heleket.com/v1/payment] {"amount":"15.00","currency":"USD","order_id":"order-42"}
-[heleket][← 200] {"state":0,"result":{"uuid":"...","url":"https:\/\/pay.heleket.com\/pay\/..."}}
+[heleket][→ POST https://api.heleket.hk/v1/payment] {"amount":"15.00","currency":"USD","order_id":"order-42"}
+[heleket][← 200] {"state":0,"result":{"uuid":"...","url":"https:\/\/pay.heleket.hk\/pay\/..."}}
 ```
 
 ## What's NOT logged

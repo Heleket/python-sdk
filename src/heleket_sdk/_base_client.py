@@ -73,7 +73,7 @@ class BaseClient:
         handling live in exactly one place.
         """
         signature = sign(body, self._api_key)
-        url = self._options.base_url + path
+        url = (self._options.base_url or "") + path  # str after __post_init__
 
         headers = {
             "merchant": self._merchant_id,

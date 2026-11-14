@@ -6,7 +6,7 @@ architecture tour — see [`docs/`](docs/README.md) for the full reference.
 
 ## What this is
 
-The reference Python SDK for the [Heleket](https://heleket.com) cryptocurrency
+The reference Python SDK for the [Heleket](https://heleket.hk) cryptocurrency
 payment API: payments, payouts, balance, exchange rates, services, and signed
 webhooks. Typed end-to-end (Pydantic v2 models, ships `py.typed`).
 
@@ -14,7 +14,7 @@ webhooks. Typed end-to-end (Pydantic v2 models, ships `py.typed`).
 - Python **3.11+** (uses `StrEnum`, `X | Y` types, `Self`).
 - Runtime deps: **Pydantic v2** (`>=2.5`) and **requests** (`>=2.31`); everything
   else is stdlib.
-- Upstream API docs: <https://doc.heleket.com>.
+- Upstream API docs: <https://doc.heleket.hk>.
 
 ## Repository map
 

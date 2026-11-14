@@ -1,5 +1,14 @@
 # Upgrading
 
+## 0.3 → 0.4
+
+The default API host moved from `api.heleket.com` to `api.heleket.hk`. No code
+changes are needed unless you hard-coded the old host. To keep using another
+domain, pass `ClientOptions(domain="heleket.com")` (requests go to
+`https://api.<domain>`); an explicit `base_url` still takes precedence.
+`ClientOptions.base_url` now defaults to `None` and is resolved to a `str` on
+construction, so `options.base_url` is always a string.
+
 ## 0.2 → 0.3
 
 `refund` moved from `HeleketPayment` to `HeleketPayout`. The Heleket API now signs

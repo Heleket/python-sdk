@@ -1,6 +1,6 @@
 """Heleket request and webhook signature.
 
-Formula (per https://doc.heleket.com/general/request-format):
+Formula (per https://doc.heleket.hk/general/request-format):
 
     sign = md5( base64(json_body) + api_key )
 

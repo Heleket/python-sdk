@@ -1,6 +1,6 @@
 """Heleket Python SDK.
 
-A reference implementation of the `Heleket <https://heleket.com>`_
+A reference implementation of the `Heleket <https://heleket.hk>`_
 cryptocurrency payment API. Covers payments, payouts, balance, services,
 exchange rates, and webhook verification.
 
@@ -17,7 +17,7 @@ See ``docs/`` for the full reference.
 
 from __future__ import annotations
 
-from ._config import DEFAULT_BASE_URL, DEFAULT_TIMEOUT_SECONDS, ClientOptions
+from ._config import DEFAULT_BASE_URL, DEFAULT_DOMAIN, DEFAULT_TIMEOUT_SECONDS, ClientOptions
 from ._debug import DebugEntry, DebugSink, stderr_sink
 from ._errors import (
     ApiError,
@@ -41,6 +41,7 @@ __all__ = [
     # Configuration
     "ClientOptions",
     "DEFAULT_BASE_URL",
+    "DEFAULT_DOMAIN",
     "DEFAULT_TIMEOUT_SECONDS",
     # Webhook
     "WebhookVerifier",

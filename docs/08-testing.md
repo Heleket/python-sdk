@@ -30,7 +30,7 @@ from tests.fakes import FakeTransport  # or relative to your own test layout
 def test_creates_invoice():
     fake = FakeTransport().enqueue_json({
         "state": 0,
-        "result": {"uuid": "u1", "url": "https://pay.heleket.com/pay/x"},
+        "result": {"uuid": "u1", "url": "https://pay.heleket.hk/pay/x"},
     })
 
     client = HeleketPayment(
@@ -47,7 +47,7 @@ def test_creates_invoice():
     # Assertions against what the client SENT:
     sent = fake.last_request()
     assert sent.method == "POST"
-    assert sent.url == "https://api.heleket.com/v1/payment"
+    assert sent.url == "https://api.heleket.hk/v1/payment"
     assert sent.headers["merchant"] == "merchant"
 ```
 

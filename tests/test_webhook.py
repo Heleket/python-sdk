@@ -92,12 +92,12 @@ def test_verify_raw_handles_php_style_payload() -> None:
     """
     body_without_sign = (
         r'{"type":"payment","uuid":"u1","status":"paid",'
-        r'"url":"https:\/\/pay.heleket.com\/pay\/abc"}'
+        r'"url":"https:\/\/pay.heleket.hk\/pay\/abc"}'
     )
     computed_sign = sign(body_without_sign, API_KEY)
     body = (
         r'{"type":"payment","uuid":"u1","status":"paid",'
-        r'"url":"https:\/\/pay.heleket.com\/pay\/abc","sign":"' + computed_sign + '"}'
+        r'"url":"https:\/\/pay.heleket.hk\/pay\/abc","sign":"' + computed_sign + '"}'
     )
 
     payload = WebhookVerifier(API_KEY).verify_raw(body)

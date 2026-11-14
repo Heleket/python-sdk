@@ -13,7 +13,7 @@ __all__ = ["PaymentStatus", "PayoutStatus", "AmlLinkStatus", "CourseSource"]
 
 
 class PaymentStatus(StrEnum):
-    """Payment statuses. See https://doc.heleket.com/methods/payments/payment-statuses."""
+    """Payment statuses. See https://doc.heleket.hk/methods/payments/payment-statuses."""
 
     PAID = "paid"
     PAID_OVER = "paid_over"
@@ -60,7 +60,7 @@ _PAYMENT_FINAL: frozenset[PaymentStatus] = frozenset(
 
 
 class PayoutStatus(StrEnum):
-    """Payout statuses. See https://doc.heleket.com/methods/payouts/payout-statuses."""
+    """Payout statuses. See https://doc.heleket.hk/methods/payouts/payout-statuses."""
 
     PROCESS = "process"
     CHECK = "check"
